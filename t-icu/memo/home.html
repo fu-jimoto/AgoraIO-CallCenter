@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="home.css" rel="stylesheet" type="text/css">
+    </head>
+    <title>T-ICUホーム</title>
+    <body>
+    T-ICUホーム
+    <div class="tabs">
+    <input id="icu" type="radio" name="tab_item" checked>
+    <label class="tab_item" for="icu">契約病院一覧</label>
+    <input id="private" type="radio" name="tab_item">
+    <label class="tab_item" for="private">T-ICUプライベート通話</label>
+    
+    <div class="tab_content" id="icu_content">
+        <div id="room1" style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+            <h1>Room1:</h1>
+            <div>Dr:</div>
+            <div>Ns:</div>
+            <div>
+                <button id="btnStartMtg" onclick="">入室</button>
+                <button id="btnLinsteningOnly" onclick="meeting()">傍聴</button>
+            </div>
+        </div>
+
+        <div id="room2" style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+            <h1>Room2:</h1>
+            <div>Dr:</div>
+            <div>Ns:</div>
+            <div>
+                <button id="btnSartMtg">入室</button>
+                <button id="btnListeningOnly">傍聴</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab_content" id="private_content">
+        <div id="private_room1" style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+            <h1>Private Room1:</h1>
+            <div>
+                <button id="btnStartMtg">入室</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    </body>
+</html>

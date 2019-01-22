@@ -10,17 +10,17 @@
 <head>
     <link href="home.css" rel="stylesheet" type="text/css">
 </head>
-<title>T-ICUホーム</title>
+<title>agentホーム</title>
 <body>
-T-ICUホーム
+agentホーム
 <div>
     <button id="btnLogout" onclick="logout()">ログアウト</button>
 </div>
 <div class="tabs">
 <input id="icu" type="radio" name="tab_item" checked>
-<label class="tab_item" for="icu">契約病院一覧</label>
+<label class="tab_item" for="icu">customer一覧</label>
 <input id="private" type="radio" name="tab_item">
-<label class="tab_item" for="private">T-ICUプライベート通話</label>
+<label class="tab_item" for="private">agentプライベート通話</label>
     
 <div class="tab_content" id="icu_content">
     <div id="room1" style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">

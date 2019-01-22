@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-<head>T-ICUログイン</head>
-<title>T-ICUログイン</title>
+<head>agentログイン</head>
+<title>agentログイン</title>
 
 <body>
 <form action="login.php" method="post">

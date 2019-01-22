@@ -8,7 +8,7 @@
 <!DOCTYPE html>
 <html>
 <head>接続中</head>
-<title>t-icu Meeting</title>
+<title>agent Meeting</title>
 <body>
 <div id="video">
     <div id="local_video" style="float:right;width:210px;height:147px;display:inline-block;"></div>
@@ -17,7 +17,7 @@
 </div>
 
 <div>
-    <button id = "channelInviteIcu" onclick = "channelInviteIcu()">病院呼出</button>
+    <button id = "channelInviteIcu" onclick = "channelInviteIcu()">customer呼出</button>
     <button id = "urgent">緊急対応要請</button>
     <button id = "cutMeeting" onclick = "leave()">切断</button>
 </div>

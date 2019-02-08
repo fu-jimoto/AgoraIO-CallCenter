@@ -6,28 +6,38 @@
 ?>
 
 <!DOCTYPE html>
-<html>
-<head>接続中
-<title>icu-Meeting</title>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="../AgoraSig-1.4.0.js"></script>
+    <script src="../AgoraRTCSDK-2.5.0.js"></script>
+    <title>customer-meeting</title>
 </head>
 
 <body>
+<div class="container">
+<div id="local_screen" style="float:right;width:420px;height:300px;display:inline-block;"></div>
+
 <div id="video" style="margin:0 auto;">
     <div id="local_video" style="float:right;width:210px;height:147px;display:inline-block;"></div>
-    <div id="local_screen" style="float:right;width:420px;height:300px;display:inline-block;"></div>
     <div id="remote_video" style="float:right;width:210px;height:147px;display:inline-block;"></div>
 </div>
 
+<tr>
+    <td><input id="textMessage"></td>
+</tr>
+
 <div>
     <button id="muteVideo" onclick="muteVideo()">カメラ on/off</button>
-    <button id="changeLayout" onclick="changeLayout()">共有/カメラ切替</button>
-    <button id="callT-icu" onclick="channelInvite()">T-ICU呼出</button>
-    <button id="leaveMeeting" onclick="leave()">切断</button>
+    <button id="muteMic" onclick="muteMic()"></button>
+    <button type="button" class="btn btn-info" id="callAgent" onclick="channelInvite()">agent呼出</button>
+    <button type="button" class="btn btn-secondary" id="leaveMeeting" onclick="leave()">Logout</button>
+</div>
 </div>
 
-<script src="../AgoraSig-1.4.0.js"></script>
-<script src="../AgoraRTCSDK-2.5.0.js"></script>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script language="javascript">
 //20180110_ for Video
 var appId = "62ec47cc139b4f12a05b82d2ffd91c47";

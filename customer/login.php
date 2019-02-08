@@ -1,6 +1,4 @@
 <?php
-    print "index.php";
-
     //20181024_セッションスタート
     session_start();
 
@@ -29,38 +27,6 @@
         }
         return null;
     }
-
-    // print "index.php";
-    // print "<br />";
-    
-    //20181016_取得アカウント表示
-    // $res = getData();
-    // print_r($res);
-    // print "<br />";
-
-    // //ログイン判定
-    // session_start();
-
-    // $error_message = "";
-
-    // if(isset($_POST)["btnLogin"]){
-    //     if($_POST["id"] == "root" && $_POST["pass"] == "password"){
-    //         $_SESSION["id"] = $_POST["id"];
-    //         $login_success_url = "meeting.php";
-    //         header("Location: {$login_success_url}");
-    //         exit;
-    //     }
-
-    //     $error_message = "ID、もしくはパスワードが間違っています。<br>　もう一度入力して下さい。";
-    // }
-
-    // //20181016_index.phpで入力されたアカウント取得
-    // function getData(){
-    //     $id = $_POST["id"];
-    //     $pass = $_POST["pass"];
-    //     $data = array("id"=>$id, "pass"=>$pass);
-    //     return $data;
-    // }
 ?>
 
 

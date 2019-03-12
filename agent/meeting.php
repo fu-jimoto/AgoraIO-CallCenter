@@ -7,62 +7,84 @@
 
 <!DOCTYPE html>
 <html>
-<head>接続中</head>
-<title>agent Meeting</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="meeting.css" type="text/css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="../AgoraSig-1.4.0.js"></script>
+    <script src="../AgoraRTCSDK-2.5.0.js"></script>
+    <title>agent meeting</title>
+</head>
+
 <body>
-<div id="video">
-    <div id="local_video" style="float:right;width:210px;height:147px;display:inline-block;"></div>
-    <div id="remote_screen" style="float:right;width:420px;height:300px;display:inline-block;"></div>
-    <div id="remote_video" style="float:right;width:210px;height:147px;display:inline-block;"></div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+            <div id="local_screen" style="float:right;width:210px;height:147px;display:inline-block;"></div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+            <div class="row" id="remote_video" style="float:right;width:210px;height:147px;display:inline-block;"></div>
+            <div class="row" id="local_video" style="float:right;width:210px;height:147px;display:inline-block;"></div>
+
+            <div class="row">
+                <textarea id="textMessageBox"></textarea>
+            </div>
+            <div class="row">
+                <input id="textMessage" value="" size="40">
+                <button type="button" class="btn btn-primary" id="sendMessage" onclick="sendMessage()">send</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <button type="button" class="icon-btn" onclick="muteMic()"><img src="../icons/mic_enable_32px.png" alt="mic_enable"></button>
+            <button type="button" class="icon-btn" onclick="muteVideo()"><img src="../icons/video_enable_32px.png" alt="video_enable"></button>
+            <button id = "channelInviteCustomer" onclick = "channelInviteCustomer()">customer呼出</button>
+            <button type="button" class="btn btn-secondary" id = "leave" onclick = "leaveChannel()">Exit</button>
+        </div>
+    </div>
 </div>
 
-<div>
-    <button id = "channelInviteIcu" onclick = "channelInviteIcu()">customer呼出</button>
-    <button id = "urgent">緊急対応要請</button>
-    <button id = "cutMeeting" onclick = "leave()">切断</button>
-</div>
-
-<script src = "../AgoraRTCSDK-2.5.0.js"></script>
-<script src = "../AgoraSig-1.4.0.js"></script>
-<script src = "https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script language = "javascript">
-
+//Video
 var appId = "62ec47cc139b4f12a05b82d2ffd91c47";
 var channelKey = null;
-var channelName = "icu";
+var channelName = "CallCenter";
 var videoUid = <?php print($_SESSION["auth"][2])?>;
-var videoClient, videoLocalStream,camera,microphone;
+var screenUid = <?php print($_SESSION["auth"][3])?>;
+var videoClient, videoLocalStream, screenClient, screenLocalStream;
+var localStreams = [];
 
-//20190115_for Signaling
+var isMuteMic = false;
+var isMuteVideo = false;
+
+//Signaling
 var signal = Signal(appId);
-var session, account, token, reconnect_count, reconnect_time, call, channel, sigRemoteUid;
-account = "s11001";
-token = "_no_need_token";
-recconect_count = 10;
-recconect_time = 30;
+var session, call, channel;
+var account = "LocalSignalingAccount";
+var token = "_no_need_token";
+var recconect_count = 10;
+var recconect_time = 30;
 //20190116
-sigRemoteUid = "s10001";
+var sigRemoteUid = "s10001";
 
-//20190115_Log into Agora's Signaling System
-session = signal.login(account, token, reconnect_count, reconnect_time);
-session.onLoginSuccess = function(uid){
-    console.log("Sig login success " + uid);
-    console.log(account);
-}
-session.onLoginFailed = function(ecode){
-    console.log("sig login failed " + ecode);
-}
 
-session.onError = function(evt){
-    console.log("onError " + evt);o
-}
-
+//Video
 //20181113_Create a Video Client
 videoClient = AgoraRTC.createClient({mode:"live",codec:"h264"});
 videoClient.init(appId, function(){
     console.log("AgoraRTC videoClient initialized");
     videoClient.join(channelKey,channelName,videoUid,function(uid){
         console.log("User "+videoUid+" join channel successfully");
+
+        //20190305_Save the uid of the local stream
+        localStreams.push(uid);
+        console.log("localStreams pushed by videoClient" + uid);
+
         videoLocalStream=AgoraRTC.createStream({
             streamID: videoUid,
             audio: true,
@@ -97,22 +119,61 @@ videoClient.on("stream-added", function(evt){
     var uid = stream.getId();
     console.log("New stream added: "+ uid);
 
-    videoClient.subscribe(stream, function(err){
-        console.log("Subscribe stream failed", err);
-    });
+    //20190305_Check if the stream is a local uid
+    if(!localStreams.includes(uid)){
+        console.log("subscribe stream: " + uid);
+        videoClient.subscribe(stream, function(err){
+            console.log("Subscribe stream failed", err);
+        });
+    }
 });
 
 videoClient.on("stream-subscribed", function(evt){
     var stream = evt.stream;
     var uid = stream.getId();
-    console.log("Subscribe remote stream successfully: "+ uid);
-    if(uid == 30001 || uid == 30002 || uid == 30003){
-        stream.play("remote_video");
-        console.log("remote_video" + uid + " start playing");
-    }else if(uid == 40001 || uid == 40002 || uid == 40003){
-        stream.play("remote_screen");
-        console.log("remote_screen: " + uid + " start playing");
-    }
+    stream.play("remote_video");
+    console.log("Subscribe remote video stream successfully: " + uid);
+});
+
+//Screen Client
+//20181105_Create a Screen Client
+screenClient = AgoraRTC.createClient({mode:"live",codec:"h264"});
+screenClient.init(appId, function(){
+    console.log("AgoraRTC screenClient initialized");
+    screenClient.join(channelKey,channelName,screenUid,function(uid){
+        console.log("screenClient "+screenUid+" join channel successfully");
+
+        //20181220_Save the uid of the local stream
+        localStreams.push(uid);
+        console.log("localStreams pushed by screenClient" + uid);
+
+        //20181105_Create a Screen Stream
+        screenLocalStream = AgoraRTC.createStream({
+            streamID: screenUid,
+            audio: false,
+            video: false,
+            screen: true,
+            mediaSource: "window"
+        });
+        
+        screenLocalStream.init(function(){
+            console.log(screenUid + "getUserMedia successfully");
+            screenLocalStream.play("local_screen");
+
+            screenClient.publish(screenLocalStream, function(err){
+                console.log("Publish screen local stream error: "+err);
+            });
+            screenClient.on("stream-published", function(evt){
+                console.log("Publish screen local stream successfully");
+            });
+        }, function(err){
+            console.log("getUserMedia failed", err);
+        });
+    }, function(err){
+        console.log("Join channel failed", err);
+    });
+}, function(err){
+    console.log("AgoraRTC screenClient init failed", err);
 });
 
 //20181119_Leave other Client
@@ -121,14 +182,98 @@ videoClient.on("peer-leave", function(evt){
     var uid = stream.getId();
     if(stream){
         stream.stop();
-        $("#remote_screen" + uid).remove();
         $("#remote_video" + uid).remove();
     }
 });
 
-//20190115_channelInviteIcu
-function channelInviteIcu(){
-    var extra = JSON.stringify({hi:"from:t-icu"});
+//20190301_Mute Mic
+function muteMic(){
+    if(isMuteMic == false){
+        videoLocalStream.disableAudio();
+        isMuteMic = true;
+    }else{
+        videoLocalStream.enableAudio();
+        isMuteMic = false;
+    }
+}
+
+//20190301_Mute Video
+function muteVideo(){
+    if(isMuteVideo == false){
+        document.getElementById("local_video").style.visibility = "hidden";
+        videoLocalStream.disableVideo();
+        console.log("Local Video muted");
+        isMuteVideo = true;
+    }else{
+        document.getElementById("local_video").style.visibility = "visible";
+        videoLocalStream.enableVideo();
+        console.log("Local Video enabled");
+        isMuteVideo = false;
+    }
+}
+
+//20181112_Leave the Channel
+function leaveChannel(){
+    videoClient.leave(function(){
+        console.log("Leave channel successfully videoClient");
+    }, function(err){
+        console.log("Leave channel failed videoClient");
+    });
+
+    screenClient.leave(function(){
+        console.log("Leave channel successfully screenClient");
+    }, function(err){
+        console.log("Leave channel failed screenClient");
+    });
+
+    location.href = "home.php";
+}
+
+
+//Signaling
+//20190115_Log into Agora's Signaling System
+session = signal.login(account, token, reconnect_count, reconnect_time);
+session.onLoginSuccess = function(uid){
+    console.log("Sig login success " + uid);
+
+    //20190311_Join a channel(sig)
+    channel = session.channelJoin(channelName);
+    channel.onChannelJoined = function(){
+        console.log(account + " channel join success");
+
+        //20190311_A channel message has been received
+        channel.onMessageChannelReceive = function(account, uid, msg){
+            addMessage(account, msg);
+        }
+    }
+    channel.onChannelJoinFailed = function(ecode){
+        console.log(account + "Sig channel join failed " + ecode);
+    }
+}
+session.onLoginFailed = function(ecode){
+    console.log("sig login failed " + ecode);
+}
+
+session.onError = function(evt){
+    console.log("onError " + evt);o
+}
+
+//20190311_Send Message
+function sendMessage(){
+    channel.messageChannelSend($("#textMessage").val(), function(){
+        addMessage($("#textMessage").val());
+        $("#textMessage").val("");
+    });
+}
+
+function addMessage(msg){
+    var currentMsg = ($("#textMessage").val());
+    $("#textMessage").val("");
+}
+
+//20190115_channelInviteCustomer
+function channelInviteCustomer(){
+    var extra = JSON.stringify({hi:"from:customer"});
     call = session.channelInviteUser2(channelName, sigRemoteUid, extra);
     session.cb = function(err, ret){
         console.log("session.cb" + err + " " + ret);
@@ -139,18 +284,6 @@ function channelInviteIcu(){
         console.log("Invite failed");
     }
 }
-
-//20181112_Leave the Channel
-function leave(){
-    videoClient.leave(function(){
-        console.log("Leave channel successfully");
-    }, function(err){
-        console.log("Leave channel failed");
-    });
-
-    location.href = "home.php";
-}
-
 </script>
 
 </body>

@@ -43,7 +43,6 @@
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <button type="button" class="icon-btn" onclick="muteMic()"><img src="../icons/mic_enable_32px.png" alt="mic_enable"></button>
             <button type="button" class="icon-btn" onclick="muteVideo()"><img src="../icons/video_enable_32px.png" alt="video_enable"></button>
-            <button id = "channelInviteCustomer" onclick = "channelInviteCustomer()">customer呼出</button>
             <button type="button" class="btn btn-secondary" id = "leave" onclick = "leaveChannel()">Exit</button>
         </div>
     </div>
@@ -65,10 +64,10 @@ var isMuteVideo = false;
 //Signaling
 var signal = Signal(appId);
 var session, call, channel;
-var account = "LocalSignalingAccount";
+var account = "agentSignalingAccount";
 var token = "_no_need_token";
-var recconect_count = 10;
-var recconect_time = 30;
+var reconnect_count = 10;
+var reconnect_time = 30;
 //20190116
 var sigRemoteUid = "s10001";
 
@@ -243,7 +242,8 @@ session.onLoginSuccess = function(uid){
 
         //20190311_A channel message has been received
         channel.onMessageChannelReceive = function(account, uid, msg){
-            addMessage(account, msg);
+            console.log("onMessageChannelReceive " + account);
+                addMessage(account, msg);
         }
     }
     channel.onChannelJoinFailed = function(ecode){
@@ -251,24 +251,27 @@ session.onLoginSuccess = function(uid){
     }
 }
 session.onLoginFailed = function(ecode){
-    console.log("sig login failed " + ecode);
+    console.log("Sig login failed " + ecode);
 }
 
 session.onError = function(evt){
-    console.log("onError " + evt);o
+    console.log("onError " + evt);
 }
 
 //20190311_Send Message
 function sendMessage(){
     channel.messageChannelSend($("#textMessage").val(), function(){
-        addMessage($("#textMessage").val());
         $("#textMessage").val("");
     });
 }
 
-function addMessage(msg){
-    var currentMsg = ($("#textMessage").val());
-    $("#textMessage").val("");
+function addMessage(account, msg){
+    var currentMessage = ($("#textMessageBox").val());
+    if(account == "agentSignalingAccount"){
+        $("#textMessageBox").val(currentMessage + "you :" + msg + "\n");
+    }else{
+        $("#textMessageBox").val(currentMessage + "customer : " + msg + "\n");
+    }
 }
 
 //20190115_channelInviteCustomer

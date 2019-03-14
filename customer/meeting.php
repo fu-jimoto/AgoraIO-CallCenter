@@ -48,7 +48,7 @@
             <div active="true" type="camera" class="icon-btn"><img class="icon-btn--active" src="../icons/camera_enable_32px.png" alt></div> -->
             <button type="button" class="icon-btn" onclick="muteMic()"><img src="../icons/mic_enable_32px.png" alt="mic_enable"></button>
             <button type="button" class="icon-btn" onclick="muteVideo()"><img src="../icons/video_enable_32px.png" alt="video_enable"></button>
-            <button type="button" class="btn btn-info" id="callAgent" onclick="channelInvite()">agent呼出</button>
+            <button type="button" class="btn btn-info" id="callAgent" onclick="channelInvite()">Call agent</button>
             <button type="button" class="btn btn-secondary" id="leaveChannel" onclick="leaveChannel()">Exit</button>
         </div>
     </div>
@@ -70,12 +70,12 @@ var isMuteVideo = false;
 //Signaling
 var signal = Signal(appId);
 var session, call, channel;
-var account = "LocalSignalingAccount";
+var account = "customerSignalingAccount";
 var token = "_no_need_token";
 var reconnect_count = 10;
-var recconect_time = 30;
+var reconnect_time = 30;
 //20181130
-var sigRemoteUid = "s11001";
+var sigRemoteUid = "agentSignalingAccount";
 
 
 //Video
@@ -215,31 +215,24 @@ function leaveChannel(){
 
 //Signaling
 //20181120_Log into Agora's Signaling System
-// session = signal.login(account,token,reconnect_count,reconnect_time);
 signal.setDoLog(true);
-session = signal.login(account,token);
+session = signal.login(account, token, reconnect_count, reconnect_time);
 session.onLoginSuccess = function(uid){
     console.log("Sig login success " + uid);
-    //不要
-    // //20190116_A Call Request has been Received
-    // session.onInviteReceived = function(channel, uid, extra){
-    //     console.log("Receive invite meeting from " + channel + " " + uid + " " + extra);
-    //     //20190117_
-    //     window.confirm("呼ばれていますよ");
-    // }
 
     //20181122/26_Join a channel(sig)
     channel = session.channelJoin(channelName);
     channel.onChannelJoined = function(){
-        console.log(account + " channel join success");
+        console.log(account + " : " + uid + " channel join success");
 
         //20190311_A channel message has been received
         channel.onMessageChannelReceive = function(account, uid, msg){
-           addMessage(account, msg);
+            console.log("onMessageChannelReceive " + account);
+                addMessage(account, msg);   
         }
     }
     channel.onChannelJoinFailed = function(ecode){
-        console.log(account + " Sig channel join failed " + ecode);
+        console.log(account + " : " + uid + " Sig channel join failed " + ecode);
     }
 }
 
@@ -249,20 +242,24 @@ session.onLoginFailed = function(ecode){
 
 //20181214_Sig Error
 session.onError = function(evt){
-    console.log("onError");
+    console.log("onError " + evt);
 }
 
 //20190305_Send Message
 function sendMessage(){
     channel.messageChannelSend($("#textMessage").val(), function(){
-        addMessage($("#textMessage").val());
+        // addMessage($("#textMessage").val());
         $("#textMessage").val("");
     });
 }
 
-function addMessage(msg){
-    var currentMsg = $("#textMessageBox").val();
-    $("#textMessageBox").val(currentMsg + videoUid + ":" + msg + "\n");
+function addMessage(account, msg){
+    var currentMessage = $("#textMessageBox").val();
+    if(account == "customerSignalingAccount"){
+        $("#textMessageBox").val(currentMessage + "you : " + msg + "\n");
+    }else{
+        $("#textMessageBox").val(currentMessage + "agent : " + msg + "\n");
+    }
 }
 
 //20181120_Channel Invite

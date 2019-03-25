@@ -10,30 +10,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="meeting.css" type="text/css">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-    <script src="../AgoraSig-1.4.0.js"></script>
-    <script src="../AgoraRTCSDK-2.5.0.js"></script>
     <title>customer meeting</title>
 </head>
 
 <body>
 <div class="container-fluid">
     <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
-            <div id="remote_screen" style="float:right;width:420px;height:300px;display:inline-block;"></div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+            <div id="remote_screen" style="float:center;width:600px;height:450px;display:inline-block;background-color:#999999;"></div>
         </div>
 
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-            <div class="row" id="remote_video" style="float:right;width:210px;height:147px;display:inline-block;"></div>
-            <div class="row" id="local_video" style="float:right;width:210px;height:147px;display:inline-block;"></div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3">
+            <div class="row" id="remote_video" style="float:center;width:300px;height:225px;display:inline-block;background-color:#999999;"></div>            
+            <div class="row" id="local_video" style="float:center;width:300px;height:225px;display:inline-block;background-color:#999999;"></div>            
+        </div>
 
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3">
             <div class="row">
-                <textarea id="textMessageBox"></textarea>
+                <textarea id="textMessageBox" style="float:center;width:340px;height:425px;"></textarea>
             </div>
             <div class="row">
-                <input id="textMessage" value="" size="40">
+                <input id="textMessage" value="" size="30">
                 <button type="button" class="btn btn-primary" id="sendMessage" onclick="sendMessage()">send</button>
             </div>
         </div>
@@ -46,8 +45,8 @@
             <!-- Ref. Agora sample code
             <div active="true" type="mic" class="icon-btn"><img class="icon-btn--active" src="../icons/mic_enable_32px.png" alt></div>
             <div active="true" type="camera" class="icon-btn"><img class="icon-btn--active" src="../icons/camera_enable_32px.png" alt></div> -->
-            <button type="button" class="icon-btn" onclick="muteMic()"><img src="../icons/mic_enable_32px.png" alt="mic_enable"></button>
-            <button type="button" class="icon-btn" onclick="muteVideo()"><img src="../icons/video_enable_32px.png" alt="video_enable"></button>
+            <button type="button" class="icon-btn" onclick="muteMic()"><img src="../icons/mic_enable_32px.png" alt="mic_icon" id="mic_icon"></button>
+            <button type="button" class="icon-btn" onclick="muteVideo()"><img src="../icons/video_enable_32px.png" alt="video_icon" id="video_icon"></button>
             <button type="button" class="btn btn-info" id="callAgent" onclick="channelInvite()">Call agent</button>
             <button type="button" class="btn btn-secondary" id="leaveChannel" onclick="leaveChannel()">Exit</button>
         </div>
@@ -55,6 +54,12 @@
 
 </div>
 
+<!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script> -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="../AgoraSig-1.4.0.js"></script>
+<script src="../AgoraRTCSDK-2.5.0.js"></script>
 <script language="javascript">
 //Video
 var appId = "62ec47cc139b4f12a05b82d2ffd91c47";
@@ -171,9 +176,11 @@ videoClient.on("peer-leave",function(evt){
 function muteMic(){
     if(isMuteMic == false){
         videoLocalStream.disableAudio();
+        document.getElementById("mic_icon").src = "../icons/mic_mute_32px.png";
         isMuteMic = true;
     }else{
         videoLocalStream.enableAudio();
+        document.getElementById("mic_icon").src = "../icons/mic_enable_32px.png";
         isMuteMic = false;
     }
 }
@@ -182,13 +189,17 @@ function muteMic(){
 function muteVideo(){
     //20190111_Layout visibilityを追加
     if(isMuteVideo == false){
-        document.getElementById("local_video").style.visibility = "hidden";
+        // document.getElementById("local_video").style.visibility = "hidden";
         videoLocalStream.disableVideo();
+        //20190325_icon
+        document.getElementById("video_icon").src = "../icons/video_mute_32px.png";
         console.log("Local video muted");
         isMuteVideo = true;
     }else{
-        document.getElementById("local_video").style.visibility = "visible";
+        // document.getElementById("local_video").style.visibility = "visible";
         videoLocalStream.enableVideo();
+        //20190325_icon
+        document.getElementById("video_icon").src = "../icons/video_enable_32px.png";
         console.log("Local Video enabled");
         isMuteVideo = false;
     }
@@ -209,6 +220,11 @@ function leaveChannel(){
         console.log("Leave channel failed");
     });
     
+    //20190323_Sig leave a channel
+    channel.channelLeave(function(){
+        console.log("Siganling leave channel successfully");
+    });
+
     location.href = "logout.php";
 }
 
@@ -225,10 +241,19 @@ session.onLoginSuccess = function(uid){
     channel.onChannelJoined = function(){
         console.log(account + " : " + uid + " channel join success");
 
+        //20190323_Another user has left the channel
+        channel.onChannelUserLeaved = function(account, uid){
+            console.log("leave channel : " + account + " " + uid);
+        }
+
         //20190311_A channel message has been received
         channel.onMessageChannelReceive = function(account, uid, msg){
-            console.log("onMessageChannelReceive " + account);
-                addMessage(account, msg);   
+            if(msg != "\S"){
+                console.log("onMessageChannelReceive from " + account + " : " + msg);
+                addMessage(account, msg); 
+            }else{
+                console.log("onMessageChannelReceive from " + account + " : space");
+            }
         }
     }
     channel.onChannelJoinFailed = function(ecode){
@@ -248,7 +273,6 @@ session.onError = function(evt){
 //20190305_Send Message
 function sendMessage(){
     channel.messageChannelSend($("#textMessage").val(), function(){
-        // addMessage($("#textMessage").val());
         $("#textMessage").val("");
     });
 }

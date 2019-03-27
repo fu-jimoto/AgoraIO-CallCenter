@@ -8,7 +8,7 @@
     <!-- BootstrapのJS読み込み -->
     <!-- <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script> -->
     <!-- <script src="../bootstrap-4.2.1-dist/css/bootstrap.min.css"> -->
-    <title>customer login</title>
+    <title>customer login / AgoraIO-CallCenter</title>
 </head>
 
 <body>

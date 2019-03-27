@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="meeting.css" type="text/css">
-    <title>customer meeting</title>
+    <title>customer meeting / AgoraIO-CallCenter</title>
 </head>
 
 <body>
@@ -86,7 +86,7 @@ var sigRemoteUid = "agentSignalingAccount";
 //Video
 //Video Client
 //20181025/26_Create a Video Client
-videoClient = AgoraRTC.createClient({mode: "live", codec: "h264"});
+videoClient = AgoraRTC.createClient({mode: "live", codec: "vp8"});
 //20181026_Initialize the Client
 videoClient.init(appId, function(){
     console.log("AgoraRTC videoClient initialized");
@@ -119,7 +119,7 @@ videoClient.init(appId, function(){
             });
 
             videoClient.on("stream-published", function(evt){
-                console.log("Publish video local stream successfully");
+                console.log("Publish video local stream successfully: " + uid);
             });
         }, function(err){
             console.log("getUserMedia failed", err);
@@ -137,11 +137,11 @@ videoClient.init(appId, function(){
 videoClient.on("stream-added", function(evt){
     var stream = evt.stream;
     var uid = stream.getId();
-    console.log("New stream added: "+ uid);
+    console.log("New stream added: " + uid);
 
     //20181114/16_Check if the stream is a local uid
     if(!localStreams.includes(uid)){
-        console.log("subscribe stream:"+uid);
+        console.log("subscribe stream: " + uid);
         //to subscribe the stream
         videoClient.subscribe(stream, function(err){
             console.log("Subscribe stream failed", err);
@@ -265,12 +265,12 @@ session.onLoginFailed = function(ecode){
     console.log("Sig login failed " + ecode);
 }
 
-//20181214_Sig Error
+//20181214_Sig error
 session.onError = function(evt){
     console.log("onError " + evt);
 }
 
-//20190305_Send Message
+//20190305_Send message
 function sendMessage(){
     channel.messageChannelSend($("#textMessage").val(), function(){
         $("#textMessage").val("");
@@ -286,7 +286,7 @@ function addMessage(account, msg){
     }
 }
 
-//20181120_Channel Invite
+//20181120_Channel invite
 function channelInvite(){
     var extra = JSON.stringify({hi:'from agent'});
     call = session.channelInviteUser2(channelName, sigRemoteUid, extra);
@@ -308,7 +308,7 @@ function channelInvite(){
             console.log("Invite refused by "+ sigRemoteUid + extra);
         }
     }
-    //20181203_A Call has Failed
+    //20181203_A call has failed
     call.onInviteFailed = function(extra){
         console.log("Invite failed");
     }

@@ -12,7 +12,7 @@
         header("Location: {$login_success_url}");
         exit;
     }else{
-        $error_message = "※ID、もしくはパスワードが間違っています。<br>　もう一度入力して下さい。";
+        $error_message = "The account does not exist or the password is incorrect";
         print_r($error_message);
     }
 
@@ -20,12 +20,14 @@
     //20181026_戻り値をtrue/falseから配列に変更
     function checkAccountFromCsv($id, $pass){
         $fp = fopen("account.csv","r");
+        $array = null;
         while(($data = fgetcsv($fp)) !== FALSE){
             if($data[0] == $id && $data[1] == $pass){
-                return array($data[0],$data[1],$data[2],$data[3]);
+                $array = array($data[0],$data[1],$data[2],$data[3]);
+                break;
             }
         }
-        return null;
+        return $array;
     }
 ?>
 

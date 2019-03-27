@@ -14,7 +14,7 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script src="../AgoraSig-1.4.0.js"></script>
     <script src="../AgoraRTCSDK-2.5.0.js"></script>
-    <title>agent home</title>
+    <title>agent home / AgoraIO-CallCenter</title>
 </head>
 
 <body>

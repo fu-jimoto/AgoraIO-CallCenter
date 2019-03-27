@@ -15,7 +15,7 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script src="../AgoraSig-1.4.0.js"></script>
     <script src="../AgoraRTCSDK-2.5.0.js"></script>
-    <title>agent meeting</title>
+    <title>agent meeting / AgoraIO-CallCenter</title>
 </head>
 
 <body>
@@ -76,7 +76,7 @@ var sigRemoteUid = "s10001";
 
 //Video
 //20181113_Create a Video Client
-videoClient = AgoraRTC.createClient({mode:"live",codec:"h264"});
+videoClient = AgoraRTC.createClient({mode:"live",codec:"vp8"});
 videoClient.init(appId, function(){
     console.log("AgoraRTC videoClient initialized");
     videoClient.join(channelKey,channelName,videoUid,function(uid){
@@ -98,11 +98,11 @@ videoClient.init(appId, function(){
             videoLocalStream.play("local_video");
 
             videoClient.publish(videoLocalStream, function(err){
-                console.log("Publish video local stream error: "+err);
+                console.log("Publish video local stream error: " + err);
             });
 
             videoClient.on("stream-published", function(evt){
-                console.log("Publish video local stream: " + uid + " successfully");
+                console.log("Publish video local stream successfully: " + uid);
             });
         }, function(err){
             console.log("getUserMedia failed", err);
@@ -138,11 +138,11 @@ videoClient.on("stream-subscribed", function(evt){
 
 //Screen Client
 //20181105_Create a Screen Client
-screenClient = AgoraRTC.createClient({mode:"live",codec:"h264"});
+screenClient = AgoraRTC.createClient({mode:"live",codec:"vp8"});
 screenClient.init(appId, function(){
     console.log("AgoraRTC screenClient initialized");
     screenClient.join(channelKey,channelName,screenUid,function(uid){
-        console.log("screenClient "+screenUid+" join channel successfully");
+        console.log("screenClient " + screenUid + " join channel successfully");
 
         //20181220_Save the uid of the local stream
         localStreams.push(uid);
@@ -165,7 +165,7 @@ screenClient.init(appId, function(){
                 console.log("Publish screen local stream error: "+err);
             });
             screenClient.on("stream-published", function(evt){
-                console.log("Publish screen local stream successfully");
+                console.log("Publish screen local stream successfully: " + uid);
             });
         }, function(err){
             console.log("getUserMedia failed", err);
